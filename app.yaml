@@ -1,8 +1,8 @@
 runtime: php73
-runtime_config: 
+runtime_config:
  document_root: gcp-php-notes
 env_variables:
  MYSQL_HOST: mysql:unix_socket=/cloudsql/php-projects-333723:southamerica-west1:tasks-db
- MYSQL_BD: cloud
+ MYSQL_BD: tasks
  MYSQL_USER: root
  MYSQL_PASS: emA6b4j01LspPwkL
