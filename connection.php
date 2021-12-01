@@ -1,9 +1,9 @@
 <?php
-  require_once './database.php';
+  require_once './database_params.php';
 
-  session_start();
+  $connection = new mysqli($host, $user, $password, $database);
 
-  $connection = mysqli_connect($host, $user, $database, $password);
-  if ($connection -> connect_error) die ("Fatal error");
-
+  if ($connection->connect_errno){
+    throw new RuntimeException('Error al conectar a la base de datos' . $connection-> connect_error);
+  }
 ?>
