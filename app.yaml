@@ -1,7 +1,7 @@
 runtime: php73
 
-env_variables:
-  CLOUDSQL_CONNECTION_NAME: mysql:unix_socket=/cloudsql/php-projects-333723:southamerica-west1:tasks-db
-  CLOUDSQL_DATABASE_NAME: tasks
-  CLOUDSQL_USER: root
-  CLOUDSQL_PASSWORD: emA6b4j01LspPwkL
+#env_variables:
+#  CLOUDSQL_CONNECTION_NAME: mysql:unix_socket=/cloudsql/php-projects-333723:southamerica-west1:tasks-db
+#  CLOUDSQL_DATABASE_NAME: tasks
+#  CLOUDSQL_USER: root
+#  CLOUDSQL_PASSWORD: emA6b4j01LspPwkL
