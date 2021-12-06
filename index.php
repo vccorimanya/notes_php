@@ -1,7 +1,51 @@
-<?php require_once './connection.php'; ?>
-<?php require_once './add_task.php' ;?>
+<?php 
 
-<?php include './head.php' ?>
+date_default_timezone_set("America/Lima");
+require_once './connection.php';
+require_once './add_task.php' ;
+
+ include './head.php';
+
+
+ session_start();
+ $user_id = $_SESSION['user_id'];
+
+ $where="WHERE user_id = '$user_id' and state= 1 ORDER BY deadline ASC ";
+ $now = date("Y-m-d");
+
+
+
+ if (isset($_POST['filter_tasks']))
+{
+  $fl = $_POST['filter'];
+	if ($fl == 'vencidas')
+	{
+		$where="WHERE user_id = $user_id AND deadline < '$now'";
+	}
+	else if ($fl == 'archivadas')
+	{
+		$where="WHERE user_id = $user_id AND state= 0";
+	}	
+  else if ($fl == 'pendientes')
+	{
+		$where="WHERE user_id = $user_id AND state= 1";
+	}
+	else
+	{
+		$where="WHERE user_id = '$user_id' ORDER BY deadline ASC";
+	}
+}
+
+
+$query = "SELECT * FROM tasks $where";
+               
+ 
+$result_tasks = $connection->query($query);
+if(mysqli_num_rows($result_tasks)==0){
+    $mensaje="<h1>No hay registros </h1>";
+  }
+
+ ?>
 
 
 <body>
@@ -9,7 +53,6 @@
   <nav class="navbar navbar-expand-lg mb-4 navbar-light bg-light">
     <div class="container-fluid">
        <?php
-      session_start();
 
       if (isset($_SESSION['user_name']))
       {
@@ -67,15 +110,13 @@
             </tr>
           </thead>
           <tbody>
-            <?php
-              if (isset($_SESSION['user_id'])){
+          
+          <?php
 
-                $user_id = htmlspecialchars($_SESSION['user_id']);
-                $query = "SELECT * FROM tasks WHERE user_id = '$user_id' ORDER BY deadline ASC";
-                $result_tasks = $connection->query($query);
+            while ($row = $result_tasks->fetch_array(MYSQLI_NUM))
+            {?>
 
-                while($row = $result_tasks->fetch_array(MYSQLI_NUM)){ ?>
-                  <tr>
+              <tr>
                     <td><?php echo $row[1]?></td>
                     <td><?php echo $row[2]?></td>
                     <td><?php echo $row[3]?></td>
@@ -83,24 +124,22 @@
                     <td><?php echo $row[6]?></td>
                     <td><?php echo $row[7]?></td>
                     <td>
-                      <a href="edit_task.php?task_id=<?php echo $row[0]?>" class="btn btn-primary">
+                      <a href="update.php?tasks_id=<?php echo $row[0]?>" class="btn btn-primary">
                         <i class="fas fa-marker"></i>
                       </a>
                     </td>
                     <td>
-                      <a href="delete_task.php?task_id=<?php echo $row[0]?>" class="btn btn-danger">
+                      <a href="delete_task.php?tasks_id=<?php echo $row[0]?>" class="btn btn-danger">
                         <i class="fas fa-trash-alt"></i>
                       </a>
                     </td>
                     <td>
-                      <a href="save_task.php?task_id=<?php echo $row[0]?>" class="btn btn-secondary">
+                      <a href="archive.php?tasks_id=<?php echo $row[0]?>" class="btn btn-secondary">
                         <i class="fas fa-archive"></i>
                       </a>
                     </td>
                   </tr>
-
-            <?php  } }else{echo "Error";} ?>
-
+           <?php } ?>
           </tbody>
         </table>
       </div>

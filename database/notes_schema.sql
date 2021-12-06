@@ -13,6 +13,7 @@ CREATE TABLE users (
 );
 
 INSERT INTO users VALUES(1,'test','test');
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 
 --Table structure for table `pendents`
 

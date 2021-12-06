@@ -1,6 +1,7 @@
 <?php
   $host = 'localhost';
-  $user = 'tasksdev';
-  $password = 'tasksdbserver2021';
+  $user = 'dev';
+  $password = 'dev20202021';
   $database = 'tasks';
+  $port = '3306';
 ?>
