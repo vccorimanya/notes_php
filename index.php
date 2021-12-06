@@ -4,13 +4,15 @@ date_default_timezone_set("America/Lima");
 require_once './connection.php';
 require_once './add_task.php' ;
 
- include './head.php';
+include './head.php';
 
 
  session_start();
  $user_id = $_SESSION['user_id'];
 
  $where="WHERE user_id = '$user_id' and state= 1 ORDER BY deadline ASC ";
+ $estado = "";
+
  $now = date("Y-m-d");
 
 
@@ -21,6 +23,8 @@ require_once './add_task.php' ;
 	if ($fl == 'vencidas')
 	{
 		$where="WHERE user_id = $user_id AND deadline < '$now'";
+    $estado = "none";
+
 	}
 	else if ($fl == 'archivadas')
 	{
@@ -37,7 +41,7 @@ require_once './add_task.php' ;
 }
 
 
-$query = "SELECT * FROM tasks $where";
+$query = "SELECT  tasks_id, title,content, DATE_FORMAT(created_at, '%Y-%m-%e'), DATE_FORMAT(deadline, '%Y-%m-%e'),user_id,priority, state FROM tasks $where";
                
  
 $result_tasks = $connection->query($query);
@@ -50,15 +54,15 @@ if(mysqli_num_rows($result_tasks)==0){
 
 <body>
 
-  <nav class="navbar navbar-expand-lg mb-4 navbar-light bg-light">
-    <div class="container-fluid">
+  <nav >
+    <div >
        <?php
 
       if (isset($_SESSION['user_name']))
       {
           $user_name = htmlspecialchars($_SESSION['user_name']);
-          echo "<h3 class='navbar-brand'> Bienvenido otra vez $user_name</h3>
-                <a class='btn btn-outline-success' href=logout.php>Cerrar sesion</a>";
+          echo "<h3> Bienvenido otra vez $user_name</h3>
+                <a  href=logout.php>Cerrar sesion</a>";
       } else {
 
         header('Location: signin.php');
@@ -68,22 +72,22 @@ if(mysqli_num_rows($result_tasks)==0){
     </div>
   </nav>
 
-  <div class="container">
-    <div class="row">
-      <div class="col-3 ">
+  
+    
+     
         <form action="" method="POST">
-          <label for="" class="form-label">Titulo: <input type="text" class="form-control" name="title" required></label>
-          <textarea class="form-control" name="content" id="" cols="30" rows="10" placeholder="Contenido" required></textarea>
-          <label >Fecha inicio: <input class="form-control" type="text" name="created_at" required></label>
-          <label for="">Fecha fin : <input class="form-control" type="text" name="deadline" required></label>
-          <label class="form-label" for="priority">Prioridad :
-            <select class="form-select" name="priority" id="priority" required>
+          <label for="" >Titulo: <input type="text"  name="title" required></label><br>
+          <textarea name="content" id="" cols="30" rows="10" placeholder="Contenido" required></textarea><br>
+          <label >Fecha inicio: <input  type="text" value="<?php echo $now ?>" name="created_at" required></label><br>
+          <label for="">Fecha fin : <input  type="text" placeholder="<?php echo $now ?>" name="deadline" required></label><br>
+          <label  for="priority">Prioridad :
+            <select  name="priority" id="priority" required>
               <option value="urgente" >Urgente</option>
               <option value="medio" >Medio</option>
               <option selected value="bajo" >Bajo</option>
             </select>
           </label><br>
-          <input class="btn btn-success" type="submit" value="Añadir" name="save_task">
+          <input  type="submit" value="Añadir" name="save_task">
         </form>
         <form action="" method="POST">
             <label for="">Filtrar por: </label>
@@ -96,23 +100,21 @@ if(mysqli_num_rows($result_tasks)==0){
           <input type="submit" value="Filtrar" name="filter_tasks">
 
         </form>
-      </div>
-      <div class="col">
-        <table class="table table-hover">
-          <thead class="">
+     
+      
+        <table border>
+          <thead>
             <tr>
               <th>Titulo</th>
               <th>Contenido</th>
               <th>Fecha inicio</th>
               <th>Fecha fin</th>
               <th>Prioridad</th>
-              <th>Estado</th>
             </tr>
           </thead>
           <tbody>
           
           <?php
-
             while ($row = $result_tasks->fetch_array(MYSQLI_NUM))
             {?>
 
@@ -122,9 +124,8 @@ if(mysqli_num_rows($result_tasks)==0){
                     <td><?php echo $row[3]?></td>
                     <td><?php echo $row[4]?></td>
                     <td><?php echo $row[6]?></td>
-                    <td><?php echo $row[7]?></td>
                     <td>
-                      <a href="update.php?tasks_id=<?php echo $row[0]?>" class="btn btn-primary">
+                      <a  style="pointer-events:<?php echo $estado?>" href="update.php?tasks_id=<?php echo $row[0]?>" class="btn btn-primary">
                         <i class="fas fa-marker"></i>
                       </a>
                     </td>
@@ -142,11 +143,9 @@ if(mysqli_num_rows($result_tasks)==0){
            <?php } ?>
           </tbody>
         </table>
-      </div>
-    </div>
+      
 
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+ 
   <script src="https://kit.fontawesome.com/d98197d415.js" crossorigin="anonymous"></script>
 </body>
 </html>

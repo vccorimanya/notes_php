@@ -12,7 +12,7 @@ if  (isset($_GET['tasks_id'])) {
     $query = "SELECT title,content,created_at,deadline,priority FROM tasks WHERE tasks_id=$tasks_id";
     $result = $connection->query($query);
     if (!$result) {
-       echo "ddd";
+      
     }elseif($result->num_rows){
         $row = $result->fetch_array(MYSQLI_NUM);
         $result->close();
@@ -23,7 +23,7 @@ if  (isset($_GET['tasks_id'])) {
         $created_at = $row[2];
         $deadline = $row[3];
         $priority = $row[4];
-        echo "$title $content";
+       
     }
   }
 
@@ -46,23 +46,18 @@ if  (isset($_GET['tasks_id'])) {
 ?>
 
 
- <div class="container">
-    <div class="row">
-      <div class="col-3 ">
+
         <form action="" method="POST">
-          <label for="" class="form-label">Titulo: <input type="text" class="form-control" name="title" value="<?php echo $title; ?>" required></label>
-          <textarea class="form-control" name="content" id="" cols="30" rows="10" placeholder="Contenido" required> <?php echo $title; ?></textarea>
-          <label >Fecha inicio: <input class="form-control" type="text" name="created_at" value="<?php echo $created_at; ?>" required></label>
-          <label for="">Fecha fin : <input class="form-control" type="text" name="deadline" value="<?php echo $deadline; ?>" required></label>
-          <label class="form-label" for="priority">Prioridad :
-            <select class="form-select" name="priority" id="priority" required>
+          <label for="" >Titulo: <input type="text"  name="title" value="<?php echo $title; ?>" required></label><br>
+          <textarea name="content" id="" cols="30" rows="10" placeholder="Contenido" required> <?php echo $title; ?></textarea><br>
+          <label >Fecha inicio: <input  type="text" name="created_at" value="<?php echo $created_at; ?>" required></label><br>
+          <label for="">Fecha fin : <input  type="text" name="deadline" value="<?php echo $deadline; ?>" required></label><br>
+          <label  for="priority">Prioridad :
+            <select  name="priority" id="priority" required>
               <option value="urgente" >Urgente</option>
               <option value="medio" >Medio</option>
               <option selected value="<?php echo $priority; ?>" >Bajo</option>
             </select>
           </label><br>
-          <input class="btn btn-success" type="submit" value="Actualizar" name="update">
+          <input type="submit" value="Actualizar" name="update">
         </form>
-      </div>
-    </div>
-  </div>
