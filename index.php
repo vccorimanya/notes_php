@@ -1,15 +1,44 @@
-<?php require_once './connection.php'; ?>
-<?php require_once './add_task.php' ;?>
+<?php
 
-<?php include './head.php' ?>
+require_once './connection.php';
+require_once './add_task.php';
+include './head.php';
 
+session_start();
+
+$user_id = htmlspecialchars($_SESSION['user_id']);
+$now = date('Y-m-d');
+$deadline_status = '';
+$alert_color = '';
+$badge_color = '';
+$where= "where user_id = '$user_id' and state = 1 order by deadline ASC ";
+
+if (isset($_POST['filter_tasks'])){
+  $option=$_POST['filter'];
+  switch ($option) {
+    case 'vencidas':
+      $where = "where user_id = '$user_id' and deadline < '$now' ";
+      $deadline_status = 'none';
+      $alert_color = 'alert-danger';
+      break;
+    case 'archivadas':
+      $where = "where user_id = '$user_id' and state = 0 ";
+    break;
+    default:
+      $where = "where user_id = '$user_id' and state = 1 order by deadline ASC ";
+      break;
+  }
+}
+
+$query = "SELECT tasks_id, title,content, DATE_FORMAT(created_at,'%Y-%m-%d'), DATE_FORMAT(deadline,'%Y-%m-%d'), user_id, priority, state FROM tasks $where";
+$result_tasks = $connection->query($query);
+
+?>
 
 <body>
-
   <nav class="navbar navbar-expand-lg mb-4 navbar-light bg-light">
     <div class="container-fluid">
        <?php
-      session_start();
 
       if (isset($_SESSION['user_name']))
       {
@@ -29,32 +58,49 @@
     <div class="row">
       <div class="col-3 ">
         <form action="" method="POST">
-          <label for="" class="form-label">Titulo: <input type="text" class="form-control" name="title" required></label>
-          <textarea class="form-control" name="content" id="" cols="30" rows="10" placeholder="Contenido" required></textarea>
-          <label >Fecha inicio: <input class="form-control" type="text" name="created_at" required></label>
-          <label for="">Fecha fin : <input class="form-control" type="text" name="deadline" required></label>
-          <label class="form-label" for="priority">Prioridad :
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" name="title" placeholder="Titulo" required>
+            <label>Titulo:</label>
+          </div>
+          <div class="form-floating mb-3">
+            <textarea class="form-control style="height: 100px" name="content" id="floatingTextarea2" style="height: 100px" placeholder="Contenido" required></textarea>
+            <label>Contenido:</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input class="form-control" type="text" name="created_at"  value="<?php echo $now ?>" required>
+            <label >Fecha inicio:</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input class="form-control" type="text" name="deadline" placeholder="<?php echo $now ?>" required>
+            <label for="">Fecha fin:</label>
+          </div>
+          <div class="form-floating mb-3">
             <select class="form-select" name="priority" id="priority" required>
               <option value="urgente" >Urgente</option>
               <option value="medio" >Medio</option>
               <option selected value="bajo" >Bajo</option>
             </select>
-          </label><br>
+            <label class="form-label" for="priority">Prioridad :</label>
+          </div>
           <input class="btn btn-success" type="submit" value="Añadir" name="save_task">
-        </form>
-        <form action="" method="POST">
-            <label for="">Filtrar por: </label>
-            <select name="filter" id="">
-              <option value="todos">Todos</option>
-              <option value="pendientes">Pendientes</option>
-              <option value="vencidas">Vencidas</option>
-              <option value="archivadas">Archivadas</option>
-            </select>
-          <input type="submit" value="Filtrar" name="filter_tasks">
-
         </form>
       </div>
       <div class="col">
+         <form class="row-cols-md-4  d-flex align-items-center" action="" method="POST">
+            <div class="form-floating ">
+              <select class="form-select" name="filter" id="">
+                <option value="todos">Todos</option>
+                <option value="pendientes">Pendientes</option>
+                <option value="vencidas">Vencidas</option>
+                <option value="archivadas">Archivadas</option>
+              </select>
+              <label for="">Filtrar por: </label>
+            </div>
+            <div class="w-auto">
+              <input class="btn btn-dark w-auto ms-3" type="submit" value="Filtrar" name="filter_tasks">
+            </div>
+        </form>
+
         <table class="table table-hover">
           <thead class="">
             <tr>
@@ -63,43 +109,43 @@
               <th>Fecha inicio</th>
               <th>Fecha fin</th>
               <th>Prioridad</th>
-              <th>Estado</th>
+              <th>Accciones</th>
             </tr>
-          </thead>
+          </thead >
           <tbody>
             <?php
-              if (isset($_SESSION['user_id'])){
+                while($row = $result_tasks->fetch_array(MYSQLI_NUM)){
 
-                $user_id = htmlspecialchars($_SESSION['user_id']);
-                $query = "SELECT * FROM tasks WHERE user_id = '$user_id' ORDER BY deadline ASC";
-                $result_tasks = $connection->query($query);
+                  if ($row[6]=='urgente'){
+                    $badge_color = 'bg-danger';
+                  }elseif($row[6]=='medio'){
+                    $badge_color= 'bg-warning text-dark';
+                  }else{
+                    $badge_color = 'bg-info text-dark';
+                  }
 
-                while($row = $result_tasks->fetch_array(MYSQLI_NUM)){ ?>
-                  <tr>
+                  ?>
+
+                  <tr class="alert <?php echo $alert_color?>" >
                     <td><?php echo $row[1]?></td>
                     <td><?php echo $row[2]?></td>
                     <td><?php echo $row[3]?></td>
                     <td><?php echo $row[4]?></td>
-                    <td><?php echo $row[6]?></td>
-                    <td><?php echo $row[7]?></td>
+                    <td><span class="badge <?php echo $badge_color?>"><?php echo $row[6]?></span></td>
                     <td>
-                      <a href="edit_task.php?task_id=<?php echo $row[0]?>" class="btn btn-primary">
+                      <a style="pointer-events: <?php echo $deadline_status?>" href="update.php?tasks_id=<?php echo $row[0]?>" class="btn btn-primary" >
                         <i class="fas fa-marker"></i>
                       </a>
-                    </td>
-                    <td>
-                      <a href="delete_task.php?task_id=<?php echo $row[0]?>" class="btn btn-danger">
+                       <a href="delete_task.php?tasks_id=<?php echo $row[0]?>" class="btn btn-danger">
                         <i class="fas fa-trash-alt"></i>
                       </a>
-                    </td>
-                    <td>
-                      <a href="save_task.php?task_id=<?php echo $row[0]?>" class="btn btn-secondary">
+                      <a href="archive.php?tasks_id=<?php echo $row[0]?>" class="btn btn-secondary">
                         <i class="fas fa-archive"></i>
                       </a>
                     </td>
                   </tr>
 
-            <?php  } }else{echo "Error";} ?>
+            <?php  } ?>
 
           </tbody>
         </table>

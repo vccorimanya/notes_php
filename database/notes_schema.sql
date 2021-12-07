@@ -15,7 +15,7 @@ CREATE TABLE users (
 INSERT INTO users VALUES(1,'test','test');
 
 --Table structure for table `pendents`
-
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 CREATE TABLE tasks (
   tasks_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
   title VARCHAR(255) NOT NULL,

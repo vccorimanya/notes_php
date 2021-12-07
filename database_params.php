@@ -1,6 +1,6 @@
 <?php
   $host = 'localhost';
-  $user = 'tasksdev';
-  $password = 'tasksdbserver2021';
+  $user = 'dev';
+  $password = 'dev2021';
   $database = 'tasks';
 ?>
